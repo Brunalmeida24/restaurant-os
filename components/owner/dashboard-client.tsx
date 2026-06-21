@@ -1,12 +1,16 @@
 "use client"
 
 import { useMemo } from "react"
-import { ArrowUp, ArrowDown } from "lucide-react"
+
+interface MenuItemRef {
+  name: string
+  emoji: string
+}
 
 interface OrderItemRow {
   quantity: number
   unit_price: number
-  menu_items: { name: string; emoji: string }
+  menu_items: MenuItemRef | MenuItemRef[]
 }
 
 interface PaidOrder {
@@ -44,6 +48,13 @@ const hourLabels = Array.from({ length: 12 }, (_, i) => {
   const hour = 11 + i
   return `${hour}h`
 })
+
+function getMenuItem(menuItems: MenuItemRef | MenuItemRef[]): MenuItemRef | null {
+  if (Array.isArray(menuItems)) {
+    return menuItems[0] ?? null
+  }
+  return menuItems ?? null
+}
 
 export function DashboardClient({
   paidToday,
@@ -102,14 +113,16 @@ export function DashboardClient({
     const map = new Map<string, { name: string; emoji: string; qty: number; revenue: number }>()
     for (const order of paidToday) {
       for (const item of order.order_items) {
-        const key = item.menu_items.name
+        const menuItem = getMenuItem(item.menu_items)
+        if (!menuItem) continue
+        const key = menuItem.name
         const revenue = item.quantity * Number(item.unit_price)
         const existing = map.get(key)
         if (existing) {
           existing.qty += item.quantity
           existing.revenue += revenue
         } else {
-          map.set(key, { name: item.menu_items.name, emoji: item.menu_items.emoji, qty: item.quantity, revenue })
+          map.set(key, { name: menuItem.name, emoji: menuItem.emoji, qty: item.quantity, revenue })
         }
       }
     }

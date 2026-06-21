@@ -56,7 +56,7 @@ export default async function DashboardPage() {
         restaurantName={profile.restaurants?.name ?? "Restaurant"}
       />
       <DashboardClient
-        paidToday={(paidToday ?? []) as PaidOrder[]}
+        paidToday={paidToday ?? []}
         tables={tables ?? []}
         openOrders={openOrders ?? []}
         paymentsToday={paymentsToday ?? []}
